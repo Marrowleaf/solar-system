@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System Explorer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #000; font-family: 'Segoe UI', system-ui, sans-serif; color: #fff; }
+        canvas { display: block; }
+        
+        #info-panel {
+            position: fixed; top: 20px; right: 20px; width: 320px;
+            background: rgba(10, 10, 30, 0.85); border: 1px solid rgba(100, 150, 255, 0.3);
+            border-radius: 12px; padding: 20px; backdrop-filter: blur(10px);
+            transform: translateX(360px); transition: transform 0.4s ease;
+            z-index: 100; max-height: 80vh; overflow-y: auto;
+        }
+        #info-panel.visible { transform: translateX(0); }
+        #info-panel h2 { font-size: 22px; margin-bottom: 8px; color: #7eb8ff; }
+        #info-panel .subtitle { font-size: 13px; color: #8899bb; margin-bottom: 14px; }
+        #info-panel .stat { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(100,150,255,0.1); font-size: 13px; }
+        #info-panel .stat .label { color: #8899bb; }
+        #info-panel .stat .value { color: #ddeeff; font-weight: 600; }
+        #info-panel .desc { margin-top: 12px; font-size: 13px; line-height: 1.6; color: #aabbdd; }
+        #info-panel #close-btn { position: absolute; top: 12px; right: 14px; background: none; border: none; color: #667; font-size: 20px; cursor: pointer; }
+        #info-panel #close-btn:hover { color: #fff; }
+        
+        #controls {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 10px; z-index: 100;
+        }
+        #controls button {
+            background: rgba(10, 10, 30, 0.8); border: 1px solid rgba(100,150,255,0.3);
+            color: #aabbdd; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px;
+            backdrop-filter: blur(10px); transition: all 0.2s;
+        }
+        #controls button:hover { background: rgba(30, 30, 60, 0.9); color: #fff; border-color: rgba(100,150,255,0.6); }
+        #controls button.active { background: rgba(50, 60, 120, 0.9); color: #7eb8ff; border-color: #7eb8ff; }
+        
+        #hud {
+            position: fixed; top: 20px; left: 20px; z-index: 100;
+        }
+        #hud h1 { font-size: 16px; color: #7eb8ff; margin-bottom: 4px; }
+        #hud .time-display { font-size: 12px; color: #667; }
+        #hud .speed-display { font-size: 12px; color: #8899bb; margin-top: 4px; }
+
+        #search-box {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 100;
+        }
+        #search-box input {
+            background: rgba(10,10,30,0.8); border: 1px solid rgba(100,150,255,0.3);
+            color: #ddeeff; padding: 10px 20px; border-radius: 20px; font-size: 14px;
+            width: 280px; backdrop-filter: blur(10px); outline: none;
+            transition: all 0.3s;
+        }
+        #search-box input:focus { border-color: #7eb8ff; width: 350px; }
+        #search-box input::placeholder { color: #556; }
+        
+        #loading {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+        }
+        #loading h1 { font-size: 28px; color: #7eb8ff; margin-bottom: 10px; }
+        #loading p { color: #556; font-size: 14px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(100,150,255,0.2); border-top-color: #7eb8ff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        #minimap {
+            position: fixed; bottom: 70px; right: 20px; width: 180px; height: 180px;
+            background: rgba(10,10,30,0.7); border: 1px solid rgba(100,150,255,0.2);
+            border-radius: 50%; z-index: 100; overflow: hidden;
+        }
+
+        #space-station-label {
+            color: #ff9; font-size: 10px; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading"><div class="spinner"></div><h1>Solar System Explorer</h1><p>Initializing...</p></div>
+    
+    <div id="hud">
+        <h1>☀ Solar System Explorer</h1>
+        <div class="time-display" id="sim-time"></div>
+        <div class="speed-display" id="speed-display"></div>
+    </div>
+    
+    <div id="search-box"><input type="text" placeholder="Search planets, moons, stations..." id="search-input"></div>
+    
+    <div id="info-panel">
+        <button id="close-btn">&times;</button>
+        <h2 id="info-name"></h2>
+        <div class="subtitle" id="info-type"></div>
+        <div id="info-stats"></div>
+        <div class="desc" id="info-desc"></div>
+    </div>
+    
+    <div id="controls">
+        <button id="btn-slower">⏪ Slower</button>
+        <button id="btn-pause" class="active">⏸ Pause</button>
+        <button id="btn-faster">⏩ Faster</button>
+        <button id="btn-orbits">◎ Orbits</button>
+        <button id="btn-labels">🏷 Labels</button>
+        <button id="btn-follow">🎯 Follow</button>
+        <button id="btn-stations">🛰 Stations</button>
+    </div>
+
+    <div id="minimap"><canvas id="minimap-canvas" width="180" height="180"></canvas></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
