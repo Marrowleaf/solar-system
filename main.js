@@ -6,7 +6,7 @@ let scene, camera, renderer, clock;
 let simTime = 0, simSpeed = 1, paused = false;
 let orbitsVisible = true, labelsVisible = true, stationsVisible = true;
 let followTarget = null;
-let planets = [], moons = [], stations = [], asteroids = [], allBodies = [];
+let planets = [], moons = [], stations = [], asteroids = [], dwarfPlanets = [], allBodies = [];
 let raycaster, mouse, hoveredObj = null;
 let starField, sunLight, ambientLight;
 
@@ -47,6 +47,25 @@ const PLANET_DATA = [
     { name:'Neptune', radius:1.9, dist:100, speed:0.006, color:0x3355cc, tilt:28.3*Math.PI/180, rotSpeed:0.032, type:'Ice Giant',
       stats:{'Distance from Sun':'4.5B km','Diameter':'49,244 km','Day Length':'16.1 hours','Year Length':'164.8 years','Moons':'16','Temp':'-200°C','Gravity':'11.15 m/s²','Atmosphere':'80% H₂, 19% He'},
       desc:'The windiest planet with speeds up to 2,100 km/h. It\'s deep blue from methane absorption. Its moon Triton orbits backwards and has nitrogen geysers. The most distant planet.' }
+];
+
+// ── Dwarf Planet Data ──
+const DWARF_PLANET_DATA = [
+    { name:'Ceres', radius:0.18, dist:36, speed:0.22, color:0xa0a0a0, tilt:4.0*Math.PI/180, rotSpeed:0.023, type:'Dwarf Planet',
+      stats:{'Distance from Sun':'413.7M km','Diameter':'945 km','Day Length':'9.07 hours','Year Length':'4.6 Earth years','Moons':'0','Temp':'-105°C','Gravity':'0.28 m/s²','Location':'Asteroid Belt'},
+      desc:'The largest object in the asteroid belt and the only dwarf planet in the inner solar system. NASA\'s Dawn spacecraft discovered bright spots in Occator crater — salt deposits left by ancient briny water.' },
+    { name:'Pluto', radius:0.19, dist:110, speed:0.004, color:0xc4a882, tilt:122.5*Math.PI/180, rotSpeed:-0.008, type:'Dwarf Planet',
+      stats:{'Distance from Sun':'5.9B km','Diameter':'2,377 km','Day Length':'6.39 Earth days','Year Length':'248 years','Moons':'5','Temp':'-230°C','Gravity':'0.62 m/s²','Atmosphere':'Thin N₂, CH₄'},
+      desc:'Once the ninth planet, reclassified as a dwarf planet in 2006 by the IAU. NASA\'s New Horizons flyby in 2015 revealed a heart-shaped nitrogen glacier — Tombaugh Regio — and surprisingly complex geology.' },
+    { name:'Haumea', radius:0.13, dist:114, speed:0.0022, color:0xd8d0c8, tilt:28.2*Math.PI/180, rotSpeed:0.28, type:'Dwarf Planet',
+      stats:{'Distance from Sun':'~6.4B km','Diameter':'1,560 km','Day Length':'3.9 hours','Year Length':'284 years','Moons':'2','Temp':'-241°C','Gravity':'0.63 m/s²','Rings':'Yes'},
+      desc:'The strangest dwarf planet — it spins so fast (once every 3.9 hours) that centrifugal force has stretched it into an egg shape. It is the only Kuiper Belt object known to have a ring system.' },
+    { name:'Makemake', radius:0.14, dist:118, speed:0.002, color:0xc89060, tilt:29.0*Math.PI/180, rotSpeed:0.021, type:'Dwarf Planet',
+      stats:{'Distance from Sun':'~6.8B km','Diameter':'1,434 km','Day Length':'22.5 hours','Year Length':'305 years','Moons':'1','Temp':'-239°C','Gravity':'0.5 m/s²','Surface':'Methane ice'},
+      desc:'The second-brightest Kuiper Belt object after Pluto. Named after the creator god of Easter Island mythology. Its reddish hue comes from tholins — complex organic compounds formed when solar radiation strikes methane ice.' },
+    { name:'Eris', radius:0.18, dist:128, speed:0.0016, color:0xd4d0cc, tilt:44.0*Math.PI/180, rotSpeed:0.013, type:'Dwarf Planet',
+      stats:{'Distance from Sun':'~10.1B km','Diameter':'2,326 km','Day Length':'25.9 hours','Year Length':'559 years','Moons':'1 (Dysnomia)','Temp':'-240°C','Gravity':'0.82 m/s²','Location':'Scattered Disc'},
+      desc:'The discovery of Eris in 2005 directly triggered the reclassification of Pluto. Though slightly smaller in diameter, Eris is more massive than Pluto. It orbits far beyond the Kuiper Belt in the scattered disc region.' },
 ];
 
 const SUN_DATA = {
@@ -104,6 +123,7 @@ function init() {
     createPlanets();
     createAsteroidBelt();
     createKuiperBelt();
+    createDwarfPlanets();
     createSpaceStations();
     setupControls();
     setupEvents();
@@ -476,6 +496,50 @@ function createKuiperBelt() {
     scene.add(asteroids[1]);
 }
 
+// ── Dwarf Planets ──
+function createDwarfPlanets() {
+    DWARF_PLANET_DATA.forEach(data => {
+        const dp = createDwarfPlanet(data);
+        dwarfPlanets.push(dp);
+        allBodies.push(dp.mesh);
+    });
+}
+
+function createDwarfPlanet(data) {
+    const geo = new THREE.SphereGeometry(data.radius, 24, 24);
+    const mat = new THREE.MeshStandardMaterial({ color: data.color, roughness: 0.9, metalness: 0.0 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.userData = { ...data, bodyType: 'dwarfPlanet' };
+    mesh.rotation.z = data.tilt || 0;
+
+    // Haumea's extreme spin stretches it into an oblate spheroid
+    if (data.name === 'Haumea') mesh.scale.set(1.5, 0.8, 1.1);
+
+    const orbitGeo = new THREE.BufferGeometry();
+    const orbitPoints = [];
+    for (let i = 0; i <= 128; i++) {
+        const angle = (i / 128) * Math.PI * 2;
+        orbitPoints.push(new THREE.Vector3(Math.cos(angle) * data.dist, 0, Math.sin(angle) * data.dist));
+    }
+    orbitGeo.setFromPoints(orbitPoints);
+    const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color: 0x334455, transparent: true, opacity: 0.15 }));
+    scene.add(orbitLine);
+    scene.add(mesh);
+
+    return {
+        mesh, orbitLine, data,
+        angle: Math.random() * Math.PI * 2,
+        update(dt) {
+            if (!paused) this.angle += data.speed * dt * 0.1 * simSpeed;
+            this.mesh.position.x = Math.cos(this.angle) * data.dist;
+            this.mesh.position.z = Math.sin(this.angle) * data.dist;
+            if (!paused) this.mesh.rotation.y += data.rotSpeed * dt * simSpeed;
+        }
+    };
+}
+
 // ── Space Stations ──
 function createSpaceStations() {
     STATION_DATA.forEach(data => {
@@ -688,6 +752,7 @@ function setupEvents() {
     document.getElementById('btn-orbits').onclick = () => {
         orbitsVisible = !orbitsVisible;
         planets.forEach(p => p.orbitLine.visible = orbitsVisible);
+        dwarfPlanets.forEach(dp => dp.orbitLine.visible = orbitsVisible);
         document.getElementById('btn-orbits').classList.toggle('active', orbitsVisible);
     };
     document.getElementById('btn-labels').onclick = () => {
@@ -780,6 +845,17 @@ function drawMinimap() {
         ctx.fill();
     });
     
+    // Dwarf planets (small grey dots)
+    dwarfPlanets.forEach(dp => {
+        const dist = dp.data.dist * scale;
+        const x = cx + Math.cos(dp.angle) * dist;
+        const y = cy + Math.sin(dp.angle) * dist;
+        ctx.fillStyle = '#888888';
+        ctx.beginPath();
+        ctx.arc(x, y, 1, 0, Math.PI*2);
+        ctx.fill();
+    });
+
     // Camera indicator
     const camX = cx + (camera.position.x * scale * 0.5) % 90;
     const camZ = cy + (camera.position.z * scale * 0.5) % 90;
@@ -789,13 +865,47 @@ function drawMinimap() {
     ctx.fill();
 }
 
-// ── Labels (2D overlay via canvas) ──
+// ── Labels (2D overlay canvas) ──
 function drawLabels() {
+    const canvas = document.getElementById('labels-canvas');
+    if (canvas.width !== window.innerWidth) canvas.width = window.innerWidth;
+    if (canvas.height !== window.innerHeight) canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     if (!labelsVisible) return;
-    
-    const canvas = renderer.domElement;
-    const ctx = renderer.getContext();
-    // We'll use a 2D overlay approach
+
+    const tempVec = new THREE.Vector3();
+
+    allBodies.forEach(body => {
+        if (!body.userData.name) return;
+        if (body.userData.bodyType === 'station' && !stationsVisible) return;
+
+        body.getWorldPosition(tempVec);
+        tempVec.project(camera);
+
+        if (tempVec.z > 1) return; // behind camera
+
+        const x = (tempVec.x * 0.5 + 0.5) * canvas.width;
+        const y = (-tempVec.y * 0.5 + 0.5) * canvas.height;
+
+        if (x < 0 || x > canvas.width || y < -20 || y > canvas.height) return;
+
+        const { bodyType } = body.userData;
+        const fontSize = bodyType === 'star' ? 14 : bodyType === 'moon' || bodyType === 'station' ? 9 : 11;
+        const color = bodyType === 'star' ? '#ffcc44'
+            : bodyType === 'dwarfPlanet' ? '#aaaaaa'
+            : bodyType === 'moon' ? '#9aabb8'
+            : bodyType === 'station' ? '#ccaa44'
+            : '#aaccff';
+
+        ctx.font = `${fontSize}px 'Segoe UI', system-ui, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        ctx.fillText(body.userData.name, x + 1, y - 8);
+        ctx.fillStyle = color;
+        ctx.fillText(body.userData.name, x, y - 9);
+    });
 }
 
 // ── Main Loop ──
@@ -816,6 +926,9 @@ function animate() {
     
     // Update stations
     stations.forEach(s => s.update(dt));
+
+    // Update dwarf planets
+    dwarfPlanets.forEach(dp => dp.update(dt));
     
     // Rotate asteroid belt slowly
     if (asteroids[0] && !paused) asteroids[0].rotation.y += dt * 0.01 * simSpeed;
@@ -841,8 +954,8 @@ function animate() {
     camera.lookAt(camTarget);
     
     renderer.render(scene, camera);
-    
-    // Minimap
+
+    drawLabels();
     drawMinimap();
 }
 
