@@ -1,8 +1,20 @@
 # 🪐 Solar System Explorer
 
+**[🌐 Live Demo](https://marrowleaf.github.io/solar-system/)** — Open in your browser, no install needed.
+
 An interactive 3D solar system simulation built with Three.js. Explore the Sun, all 8 planets, their moons, asteroids, and real space stations — right in your browser.
 
-![Solar System Explorer](https://img.shields.io/badge/Three.js-3D_Simulation-blue?style=flat-square) ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=flat-square) ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+![Solar System Explorer — Top-down view](screenshots/solar-system-topdown.png)
+
+![Solar System Explorer — Saturn with rings](screenshots/solar-system-saturn.png)
+
+![Solar System Explorer — Jupiter info panel](screenshots/solar-system-jupiter.png)
+
+![Solar System Explorer — The Sun](screenshots/solar-system-sun.png)
+
+![Solar System Explorer — Earth](screenshots/solar-system-earth.png)
+
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=flat-square) ![Three.js](https://img.shields.io/badge/Three.js-3D_Simulation-blue?style=flat-square) ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 ## ✨ Features
 
@@ -23,25 +35,26 @@ An interactive 3D solar system simulation built with Three.js. Explore the Sun, 
 
 Just open `index.html` in a browser. No build step, no dependencies to install.
 
+**[🌐 Try it live](https://marrowleaf.github.io/solar-system/)**
+
+Or run locally:
+
 ```bash
 # Clone it
 git clone https://github.com/Marrowleaf/solar-system.git
 cd solar-system
 
 # Open it
-open index.html          # macOS
-xdg-open index.html      # Linux
-start index.html         # Windows
+open index.html            # macOS
+xdg-open index.html        # Linux
+start index.html           # Windows
 ```
 
 Or use a local server:
 
 ```bash
-# Python
-python -m http.server 8000
-
-# Node.js
-npx serve .
+python -m http.server 8000    # Python
+npx serve .                   # Node.js
 ```
 
 ## 🎮 Controls
