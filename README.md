@@ -91,6 +91,22 @@ Luna (Earth), Io/Europa/Ganymede/Callisto (Jupiter), Titan/Enceladus/Mimas (Satu
 - Colour-variant starfield (12,000 stars with warm/blue/white tones)
 - Nebula background clouds
 
+
+## 🎨 Design system
+
+This project now includes a Google-style `DESIGN.md` file named **Helios Atlas**. It defines the colour tokens, typography, rounded shapes, spacing, and component rules used by the glass HUD, search, info panel, controls, and minimap.
+
+Generated token exports are included as:
+
+- `tailwind.theme.json`
+- `tokens.json`
+
+Validate the design system with:
+
+```bash
+npx -y @google/design.md lint DESIGN.md
+```
+
 ## 🛠️ Tech
 
 - **Three.js** — WebGL 3D rendering (loaded via CDN)

@@ -5,76 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solar System Explorer</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { overflow: hidden; background: #000; font-family: 'Segoe UI', system-ui, sans-serif; color: #fff; }
-        canvas { display: block; }
-        
-        #info-panel {
-            position: fixed; top: 20px; right: 20px; width: 320px;
-            background: rgba(10, 10, 30, 0.85); border: 1px solid rgba(100, 150, 255, 0.3);
-            border-radius: 12px; padding: 20px; backdrop-filter: blur(10px);
-            transform: translateX(360px); transition: transform 0.4s ease;
-            z-index: 100; max-height: 80vh; overflow-y: auto;
+        :root {
+            --space-void: #030712;
+            --space-deep: #0B1020;
+            --orbit-cyan: #38BDF8;
+            --solar-gold: #FBBF24;
+            --planet-blue: #60A5FA;
+            --mars: #F97316;
+            --nebula: #A78BFA;
+            --text-primary: #F8FAFC;
+            --text-muted: #A7B4CA;
+            --surface: rgba(16, 24, 39, 0.78);
+            --surface-raised: rgba(22, 36, 58, 0.86);
+            --border: rgba(45, 66, 102, 0.72);
+            --glow-cyan: rgba(56, 189, 248, 0.28);
+            --glow-gold: rgba(251, 191, 36, 0.24);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 24px;
+            --radius-pill: 999px;
         }
-        #info-panel.visible { transform: translateX(0); }
-        #info-panel h2 { font-size: 22px; margin-bottom: 8px; color: #7eb8ff; }
-        #info-panel .subtitle { font-size: 13px; color: #8899bb; margin-bottom: 14px; }
-        #info-panel .stat { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(100,150,255,0.1); font-size: 13px; }
-        #info-panel .stat .label { color: #8899bb; }
-        #info-panel .stat .value { color: #ddeeff; font-weight: 600; }
-        #info-panel .desc { margin-top: 12px; font-size: 13px; line-height: 1.6; color: #aabbdd; }
-        #info-panel #close-btn { position: absolute; top: 12px; right: 14px; background: none; border: none; color: #667; font-size: 20px; cursor: pointer; }
-        #info-panel #close-btn:hover { color: #fff; }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 18% 12%, rgba(167, 139, 250, 0.18), transparent 30rem),
+                radial-gradient(circle at 74% 18%, rgba(56, 189, 248, 0.12), transparent 28rem),
+                linear-gradient(135deg, #020617 0%, var(--space-void) 42%, var(--space-deep) 100%);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-primary);
+        }
+        canvas { display: block; }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            background:
+                linear-gradient(rgba(248, 250, 252, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(248, 250, 252, 0.018) 1px, transparent 1px);
+            background-size: 72px 72px;
+            mask-image: radial-gradient(circle at center, transparent 0 34%, black 78%);
+        }
+
+        #info-panel {
+            position: fixed; top: 20px; right: 20px; width: min(340px, calc(100vw - 40px));
+            background: linear-gradient(180deg, var(--surface-raised), rgba(10, 16, 32, 0.78));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 22px; backdrop-filter: blur(18px) saturate(130%);
+            transform: translateX(390px); transition: transform 0.4s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            z-index: 100; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 24px 90px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.06);
+        }
+        #info-panel.visible { transform: translateX(0); box-shadow: 0 24px 90px rgba(0,0,0,0.42), 0 0 48px var(--glow-cyan), inset 0 1px 0 rgba(255,255,255,0.06); }
+        #info-panel h2 { font-size: 1.55rem; line-height: 1.15; letter-spacing: -0.03em; margin-bottom: 8px; color: var(--text-primary); }
+        #info-panel .subtitle { display: inline-flex; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--space-void); background: var(--solar-gold); border-radius: var(--radius-pill); padding: 7px 10px; margin-bottom: 14px; }
+        #info-panel .stat { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; border-bottom: 1px solid rgba(45,66,102,0.48); font-size: 13px; }
+        #info-panel .stat .label { color: var(--text-muted); }
+        #info-panel .stat .value { color: var(--text-primary); font-weight: 700; text-align: right; }
+        #info-panel .desc { margin-top: 14px; font-size: 13px; line-height: 1.65; color: var(--text-muted); }
+        #info-panel #close-btn { position: absolute; top: 12px; right: 14px; width: 30px; height: 30px; border-radius: 50%; background: rgba(248,250,252,0.05); border: 1px solid rgba(248,250,252,0.08); color: var(--text-muted); font-size: 20px; cursor: pointer; transition: all 0.2s ease; }
+        #info-panel #close-btn:hover { color: var(--text-primary); border-color: var(--orbit-cyan); box-shadow: 0 0 20px var(--glow-cyan); }
+
         #controls {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 10px; z-index: 100;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; z-index: 100;
+            max-width: calc(100vw - 32px);
         }
         #controls button {
-            background: rgba(10, 10, 30, 0.8); border: 1px solid rgba(100,150,255,0.3);
-            color: #aabbdd; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px;
-            backdrop-filter: blur(10px); transition: all 0.2s;
+            background: var(--surface); border: 1px solid var(--border);
+            color: var(--text-muted); padding: 10px 15px; border-radius: var(--radius-pill); cursor: pointer; font-size: 13px; font-weight: 700;
+            backdrop-filter: blur(16px) saturate(125%); transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
         }
-        #controls button:hover { background: rgba(30, 30, 60, 0.9); color: #fff; border-color: rgba(100,150,255,0.6); }
-        #controls button.active { background: rgba(50, 60, 120, 0.9); color: #7eb8ff; border-color: #7eb8ff; }
-        
+        #controls button:hover { transform: translateY(-2px); color: var(--text-primary); border-color: var(--orbit-cyan); box-shadow: 0 0 26px var(--glow-cyan), inset 0 1px 0 rgba(255,255,255,0.08); }
+        #controls button.active { background: linear-gradient(135deg, var(--orbit-cyan), #67E8F9); color: var(--space-void); border-color: rgba(103,232,249,0.85); box-shadow: 0 0 34px var(--glow-cyan); }
+
         #hud {
             position: fixed; top: 20px; left: 20px; z-index: 100;
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 16px; min-width: 220px; backdrop-filter: blur(18px) saturate(130%);
+            box-shadow: 0 20px 70px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.06);
         }
-        #hud h1 { font-size: 16px; color: #7eb8ff; margin-bottom: 4px; }
-        #hud .time-display { font-size: 12px; color: #667; }
-        #hud .speed-display { font-size: 12px; color: #8899bb; margin-top: 4px; }
+        #hud h1 { font-size: 1.05rem; line-height: 1.1; letter-spacing: 0.04em; color: var(--solar-gold); margin-bottom: 8px; text-shadow: 0 0 22px var(--glow-gold); }
+        #hud .time-display { font-size: 12px; color: var(--text-muted); }
+        #hud .speed-display { font-size: 12px; color: var(--orbit-cyan); margin-top: 5px; font-weight: 700; }
 
         #search-box {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             z-index: 100;
         }
         #search-box input {
-            background: rgba(10,10,30,0.8); border: 1px solid rgba(100,150,255,0.3);
-            color: #ddeeff; padding: 10px 20px; border-radius: 20px; font-size: 14px;
-            width: 280px; backdrop-filter: blur(10px); outline: none;
-            transition: all 0.3s;
+            background: var(--surface); border: 1px solid var(--border);
+            color: var(--text-primary); padding: 12px 22px; border-radius: var(--radius-pill); font-size: 14px;
+            width: min(320px, calc(100vw - 40px)); backdrop-filter: blur(18px) saturate(130%); outline: none;
+            transition: width 0.3s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
         }
-        #search-box input:focus { border-color: #7eb8ff; width: 350px; }
-        #search-box input::placeholder { color: #556; }
-        
+        #search-box input:focus { border-color: var(--orbit-cyan); width: min(390px, calc(100vw - 40px)); box-shadow: 0 0 34px var(--glow-cyan), inset 0 1px 0 rgba(255,255,255,0.08); }
+        #search-box input::placeholder { color: rgba(167,180,202,0.62); }
+
         #loading {
-            position: fixed; inset: 0; background: #000; z-index: 9999;
+            position: fixed; inset: 0; background: radial-gradient(circle at center, rgba(251,191,36,0.10), transparent 24rem), var(--space-void); z-index: 9999;
             display: flex; align-items: center; justify-content: center; flex-direction: column;
         }
-        #loading h1 { font-size: 28px; color: #7eb8ff; margin-bottom: 10px; }
-        #loading p { color: #556; font-size: 14px; }
-        .spinner { width: 40px; height: 40px; border: 3px solid rgba(100,150,255,0.2); border-top-color: #7eb8ff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        #loading h1 { font-size: 30px; color: var(--solar-gold); margin-bottom: 10px; letter-spacing: -0.03em; text-shadow: 0 0 34px var(--glow-gold); }
+        #loading p { color: var(--text-muted); font-size: 14px; }
+        .spinner { width: 44px; height: 44px; border: 3px solid rgba(251,191,36,0.18); border-top-color: var(--solar-gold); border-right-color: var(--orbit-cyan); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; box-shadow: 0 0 28px var(--glow-gold); }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
+
         #minimap {
-            position: fixed; bottom: 70px; right: 20px; width: 180px; height: 180px;
-            background: rgba(10,10,30,0.7); border: 1px solid rgba(100,150,255,0.2);
-            border-radius: 50%; z-index: 100; overflow: hidden;
+            position: fixed; bottom: 76px; right: 20px; width: 180px; height: 180px;
+            background: rgba(3,7,18,0.72); border: 1px solid rgba(56,189,248,0.28);
+            border-radius: 50%; z-index: 100; overflow: hidden; backdrop-filter: blur(12px);
+            box-shadow: 0 0 38px rgba(56,189,248,0.16), inset 0 0 30px rgba(56,189,248,0.08);
         }
 
         #space-station-label {
-            color: #ff9; font-size: 10px; pointer-events: none;
+            color: #FDE68A; font-size: 10px; pointer-events: none;
+        }
+
+        @media (max-width: 760px) {
+            #hud { top: 12px; left: 12px; min-width: 180px; padding: 12px; }
+            #search-box { top: 94px; }
+            #info-panel { top: 146px; right: 12px; width: calc(100vw - 24px); max-height: 56vh; }
+            #minimap { width: 132px; height: 132px; bottom: 94px; right: 12px; }
+            #controls { bottom: 12px; gap: 8px; }
+            #controls button { padding: 9px 12px; font-size: 12px; }
         }
     </style>
 </head>
