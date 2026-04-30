@@ -32,38 +32,18 @@
             --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
             --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { width: 100%; height: 100%; overflow: hidden; }
-        body {
-            background: var(--void);
-            font-family: var(--font-sans);
-            color: var(--text);
-            cursor: crosshair;
-        }
+        body { background: var(--void); font-family: var(--font-sans); color: var(--text); cursor: crosshair; }
         canvas { display: block; }
-
-        /* Scan-line overlay */
         body::after {
-            content: "";
-            position: fixed; inset: 0;
-            pointer-events: none;
-            z-index: 9998;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 255, 212, 0.015) 2px,
-                rgba(0, 255, 212, 0.015) 4px
-            );
+            content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,212,0.015) 2px, rgba(0,255,212,0.015) 4px);
             animation: scanDrift 8s linear infinite;
         }
-        @keyframes scanDrift {
-            from { background-position: 0 0; }
-            to { background-position: 0 100px; }
-        }
+        @keyframes scanDrift { from { background-position: 0 0; } to { background-position: 0 100px; } }
 
-        /* ── LOADING ── */
+        /* LOADING */
         #loading {
             position: fixed; inset: 0; z-index: 10000;
             background: radial-gradient(ellipse at center, var(--command-bg), var(--void));
@@ -72,164 +52,93 @@
         }
         #loading.fade-out { opacity: 0; pointer-events: none; }
         .loader-ring {
-            width: 80px; height: 80px; border-radius: 50%;
-            border: 3px solid transparent;
-            border-top-color: var(--hologram);
-            border-right-color: var(--plasma);
+            width: 80px; height: 80px; border-radius: 50%; border: 3px solid transparent;
+            border-top-color: var(--hologram); border-right-color: var(--plasma);
             animation: loaderSpin 1.2s linear infinite;
             box-shadow: 0 0 30px var(--glow-cyan), 0 0 60px var(--glow-magenta);
         }
         @keyframes loaderSpin { to { transform: rotate(360deg); } }
         .loader-ring-inner {
-            width: 50px; height: 50px; border-radius: 50%;
-            border: 2px solid transparent;
-            border-bottom-color: var(--solar);
-            border-left-color: var(--hologram-dim);
-            animation: loaderSpin 1.8s linear infinite reverse;
-            position: absolute;
+            width: 50px; height: 50px; border-radius: 50%; border: 2px solid transparent;
+            border-bottom-color: var(--solar); border-left-color: var(--hologram-dim);
+            animation: loaderSpin 1.8s linear infinite reverse; position: absolute;
         }
         #loading h1 {
-            margin-top: 30px; font-size: 1.6rem; font-weight: 800;
-            letter-spacing: 0.2em; color: var(--hologram);
-            text-shadow: 0 0 20px var(--glow-cyan), 0 0 40px var(--glow-cyan);
+            margin-top: 30px; font-size: 1.6rem; font-weight: 800; letter-spacing: 0.2em;
+            color: var(--hologram); text-shadow: 0 0 20px var(--glow-cyan), 0 0 40px var(--glow-cyan);
             font-family: var(--font-mono);
         }
-        #loading .sub {
-            margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);
-            font-family: var(--font-mono); letter-spacing: 0.15em;
-        }
-        #loading .bar-track {
-            margin-top: 20px; width: 200px; height: 3px;
-            background: rgba(0,255,212,0.1); border-radius: 2px; overflow: hidden;
-        }
-        #loading .bar-fill {
-            height: 100%; width: 0%; background: linear-gradient(90deg, var(--hologram), var(--plasma));
-            border-radius: 2px; transition: width 0.3s ease;
-            box-shadow: 0 0 8px var(--glow-cyan);
-        }
+        #loading .sub { margin-top: 10px; font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); letter-spacing: 0.15em; }
+        #loading .bar-track { margin-top: 20px; width: 200px; height: 3px; background: rgba(0,255,212,0.1); border-radius: 2px; overflow: hidden; }
+        #loading .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--hologram), var(--plasma)); border-radius: 2px; transition: width 0.3s ease; box-shadow: 0 0 8px var(--glow-cyan); }
 
-        /* ── HUD ── */
+        /* HUD */
         #hud {
             position: fixed; top: 16px; left: 16px; z-index: 100;
             background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 16px 20px;
-            min-width: 240px; backdrop-filter: blur(20px) saturate(150%);
+            border-radius: var(--radius-lg); padding: 16px 20px; min-width: 240px;
+            backdrop-filter: blur(20px) saturate(150%);
             box-shadow: 0 0 40px rgba(0,0,0,0.5), 0 0 20px var(--glow-cyan), inset 0 1px 0 rgba(0,255,212,0.06);
         }
-        #hud::before {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--hologram), transparent);
-            opacity: 0.5;
-        }
-        #hud h1 {
-            font-size: 0.85rem; font-weight: 800; letter-spacing: 0.18em;
-            color: var(--hologram); text-shadow: 0 0 12px var(--glow-cyan);
-            font-family: var(--font-mono);
-        }
-        #hud .time-display {
-            font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;
-            font-family: var(--font-mono); letter-spacing: 0.06em;
-        }
-        #hud .speed-display {
-            font-size: 0.72rem; color: var(--hologram); margin-top: 4px;
-            font-family: var(--font-mono); font-weight: 700;
-        }
-        #hud .coord-display {
-            font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;
-            font-family: var(--font-mono); letter-spacing: 0.04em;
-        }
+        #hud::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--hologram), transparent); opacity: 0.5; }
+        #hud h1 { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.18em; color: var(--hologram); text-shadow: 0 0 12px var(--glow-cyan); font-family: var(--font-mono); }
+        #hud .time-display { font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; font-family: var(--font-mono); letter-spacing: 0.06em; }
+        #hud .speed-display { font-size: 0.72rem; color: var(--hologram); margin-top: 4px; font-family: var(--font-mono); font-weight: 700; }
+        #hud .coord-display { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; font-family: var(--font-mono); letter-spacing: 0.04em; }
 
-        /* ── PLANET NAV ── */
+        /* PLANET NAV */
         #planet-nav {
-            position: fixed; top: 50%; left: 16px; transform: translateY(-50%);
-            z-index: 100; background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 12px 8px;
-            backdrop-filter: blur(20px) saturate(150%);
+            position: fixed; top: 50%; left: 16px; transform: translateY(-50%); z-index: 100;
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 12px 8px; backdrop-filter: blur(20px) saturate(150%);
             box-shadow: 0 0 40px rgba(0,0,0,0.5), 0 0 15px var(--glow-cyan);
             max-height: 70vh; overflow-y: auto;
         }
         #planet-nav::-webkit-scrollbar { width: 3px; }
         #planet-nav::-webkit-scrollbar-thumb { background: var(--hologram-dim); border-radius: 2px; }
         .nav-section { margin-bottom: 8px; }
-        .nav-section-title {
-            font-size: 0.55rem; font-weight: 800; letter-spacing: 0.2em;
-            color: var(--text-muted); text-transform: uppercase;
-            padding: 4px 8px; font-family: var(--font-mono);
-        }
+        .nav-section-title { font-size: 0.55rem; font-weight: 800; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; padding: 4px 8px; font-family: var(--font-mono); }
         .nav-item {
-            display: flex; align-items: center; gap: 8px; padding: 5px 10px;
-            border-radius: var(--radius-sm); cursor: pointer;
-            transition: all 0.2s ease; font-size: 0.72rem;
-            color: var(--text-muted); border: 1px solid transparent;
+            display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: var(--radius-sm);
+            cursor: pointer; transition: all 0.2s ease; font-size: 0.72rem; color: var(--text-muted); border: 1px solid transparent;
         }
-        .nav-item:hover {
-            background: rgba(0,255,212,0.06); color: var(--text);
-            border-color: var(--border);
-        }
-        .nav-item.active {
-            background: rgba(0,255,212,0.1); color: var(--hologram);
-            border-color: var(--border-bright);
-            box-shadow: 0 0 10px var(--glow-cyan);
-        }
+        .nav-item:hover { background: rgba(0,255,212,0.06); color: var(--text); border-color: var(--border); }
+        .nav-item.active { background: rgba(0,255,212,0.1); color: var(--hologram); border-color: var(--border-bright); box-shadow: 0 0 10px var(--glow-cyan); }
         .nav-item.visited .nav-dot { box-shadow: 0 0 6px currentColor; }
-        .nav-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1);
-        }
+        .nav-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); }
         .nav-name { font-family: var(--font-mono); letter-spacing: 0.04em; }
 
-        /* ── SEARCH ── */
-        #search-container {
-            position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
-            z-index: 100;
-        }
+        /* SEARCH */
+        #search-container { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 100; }
         #search-input {
-            background: var(--surface); border: 1px solid var(--border);
-            color: var(--text); padding: 12px 22px 12px 42px;
-            border-radius: var(--radius-pill); font-size: 13px;
-            width: min(340px, calc(100vw - 40px));
-            backdrop-filter: blur(20px) saturate(150%); outline: none;
+            background: var(--surface); border: 1px solid var(--border); color: var(--text);
+            padding: 12px 22px 12px 42px; border-radius: var(--radius-pill); font-size: 13px;
+            width: min(340px, calc(100vw - 40px)); backdrop-filter: blur(20px) saturate(150%); outline: none;
             transition: all 0.3s ease; font-family: var(--font-sans);
             box-shadow: 0 0 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(0,255,212,0.05);
         }
-        #search-input:focus {
-            border-color: var(--hologram); width: min(400px, calc(100vw - 40px));
-            box-shadow: 0 0 30px var(--glow-cyan), inset 0 1px 0 rgba(0,255,212,0.08);
-        }
+        #search-input:focus { border-color: var(--hologram); width: min(400px, calc(100vw - 40px)); box-shadow: 0 0 30px var(--glow-cyan), inset 0 1px 0 rgba(0,255,212,0.08); }
         #search-input::placeholder { color: var(--text-muted); }
-        .search-icon {
-            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-            color: var(--hologram-dim); font-size: 14px; pointer-events: none;
-        }
+        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--hologram-dim); font-size: 14px; pointer-events: none; }
         #search-dropdown {
             position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
-            width: min(380px, calc(100vw - 40px));
-            background: var(--surface-raised); border: 1px solid var(--border);
-            border-radius: var(--radius-md); overflow: hidden; display: none;
+            width: min(380px, calc(100vw - 40px)); background: var(--surface-raised);
+            border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; display: none;
             backdrop-filter: blur(20px); box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
         #search-dropdown.show { display: block; }
-        .search-item {
-            display: flex; align-items: center; gap: 10px; padding: 10px 16px;
-            cursor: pointer; font-size: 0.8rem; color: var(--text-muted);
-            transition: all 0.15s ease; border-bottom: 1px solid var(--border);
-        }
+        .search-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; font-size: 0.8rem; color: var(--text-muted); transition: all 0.15s ease; border-bottom: 1px solid var(--border); }
         .search-item:last-child { border-bottom: none; }
-        .search-item:hover, .search-item.highlighted {
-            background: rgba(0,255,212,0.08); color: var(--text);
-        }
-        .search-item .si-type {
-            font-size: 0.6rem; font-family: var(--font-mono);
-            color: var(--hologram-dim); letter-spacing: 0.1em;
-        }
+        .search-item:hover, .search-item.highlighted { background: rgba(0,255,212,0.08); color: var(--text); }
+        .search-item .si-type { font-size: 0.6rem; font-family: var(--font-mono); color: var(--hologram-dim); letter-spacing: 0.1em; }
 
-        /* ── INFO PANEL ── */
+        /* INFO PANEL */
         #info-panel {
             position: fixed; top: 16px; right: 16px; width: min(360px, calc(100vw - 32px));
             background: linear-gradient(180deg, var(--surface-raised), rgba(6,8,20,0.9));
-            border: 1px solid var(--border); border-radius: var(--radius-lg);
-            padding: 24px; backdrop-filter: blur(24px) saturate(150%);
-            transform: translateX(400px); transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+            border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px;
+            backdrop-filter: blur(24px) saturate(150%); transform: translateX(400px);
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
             z-index: 100; max-height: 85vh; overflow-y: auto;
             box-shadow: 0 0 60px rgba(0,0,0,0.5), 0 0 30px var(--glow-cyan), inset 0 1px 0 rgba(0,255,212,0.06);
         }
@@ -237,167 +146,116 @@
         #info-panel::-webkit-scrollbar { width: 3px; }
         #info-panel::-webkit-scrollbar-thumb { background: var(--hologram-dim); border-radius: 2px; }
         #close-info {
-            position: absolute; top: 12px; right: 14px; width: 28px; height: 28px;
-            border-radius: 50%; background: rgba(255,255,255,0.04);
-            border: 1px solid var(--border); color: var(--text-muted);
-            font-size: 16px; cursor: pointer; transition: all 0.2s ease;
-            display: flex; align-items: center; justify-content: center;
+            position: absolute; top: 12px; right: 14px; width: 28px; height: 28px; border-radius: 50%;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text-muted);
+            font-size: 16px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center;
         }
         #close-info:hover { color: var(--plasma); border-color: var(--plasma); box-shadow: 0 0 15px var(--glow-magenta); }
-        #info-name {
-            font-size: 1.4rem; font-weight: 800; line-height: 1.1;
-            letter-spacing: -0.02em; margin-bottom: 8px; color: var(--text);
-        }
-        #info-type-badge {
-            display: inline-flex; font-size: 0.62rem; font-weight: 800;
-            letter-spacing: 0.16em; text-transform: uppercase; padding: 5px 12px;
-            border-radius: var(--radius-pill); margin-bottom: 16px;
-            font-family: var(--font-mono);
-        }
+        #info-name { font-size: 1.4rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 8px; color: var(--text); }
+        #info-type-badge { display: inline-flex; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; padding: 5px 12px; border-radius: var(--radius-pill); margin-bottom: 16px; font-family: var(--font-mono); }
         .badge-planet { background: rgba(0,255,212,0.15); color: var(--hologram); border: 1px solid rgba(0,255,212,0.3); }
         .badge-star { background: rgba(255,184,0,0.15); color: var(--solar); border: 1px solid rgba(255,184,0,0.3); }
         .badge-dwarf { background: rgba(123,47,190,0.15); color: var(--nebula); border: 1px solid rgba(123,47,190,0.3); }
         .badge-moon { background: rgba(90,110,138,0.2); color: var(--text-muted); border: 1px solid rgba(90,110,138,0.3); }
         .badge-station { background: rgba(255,0,110,0.12); color: var(--plasma); border: 1px solid rgba(255,0,110,0.3); }
         .badge-comet { background: rgba(0,255,212,0.08); color: var(--hologram-dim); border: 1px solid rgba(0,255,212,0.2); }
+        .badge-probe { background: rgba(255,184,0,0.12); color: var(--solar); border: 1px solid rgba(255,184,0,0.25); }
         #info-stats { margin-top: 8px; }
-        .stat-row {
-            display: flex; justify-content: space-between; gap: 12px;
-            padding: 7px 0; border-bottom: 1px solid rgba(0,255,212,0.06);
-            font-size: 0.78rem;
-        }
+        .stat-row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid rgba(0,255,212,0.06); font-size: 0.78rem; }
         .stat-label { color: var(--text-muted); font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em; }
         .stat-value { color: var(--text); font-weight: 700; text-align: right; font-family: var(--font-mono); }
-        #info-desc {
-            margin-top: 16px; font-size: 0.8rem; line-height: 1.7;
-            color: var(--text-muted);
-        }
-        #info-fact {
-            margin-top: 14px; padding: 12px; border-radius: var(--radius-md);
-            background: rgba(0,255,212,0.04); border: 1px solid var(--border);
-            font-size: 0.72rem; color: var(--hologram-dim);
-            font-family: var(--font-mono); line-height: 1.5;
-        }
+        #info-desc { margin-top: 16px; font-size: 0.8rem; line-height: 1.7; color: var(--text-muted); }
+        #info-fact { margin-top: 14px; padding: 12px; border-radius: var(--radius-md); background: rgba(0,255,212,0.04); border: 1px solid var(--border); font-size: 0.72rem; color: var(--hologram-dim); font-family: var(--font-mono); line-height: 1.5; }
         #info-fact .fact-label { color: var(--hologram); font-weight: 700; letter-spacing: 0.1em; }
+        #info-light-time { margin-top: 10px; padding: 10px; border-radius: var(--radius-md); background: rgba(255,184,0,0.06); border: 1px solid rgba(255,184,0,0.15); font-size: 0.68rem; color: var(--solar); font-family: var(--font-mono); display: none; }
+        #info-light-time.show { display: block; }
+        #info-distance { margin-top: 8px; padding: 8px 12px; border-radius: var(--radius-sm); background: rgba(0,255,212,0.04); border: 1px solid var(--border); font-size: 0.68rem; color: var(--hologram); font-family: var(--font-mono); display: none; }
+        #info-distance.show { display: block; }
 
-        /* ── COMPARISON ── */
+        /* COMPARISON */
         #comparison {
-            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-            z-index: 100; background: var(--surface-raised); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 20px;
-            backdrop-filter: blur(24px); display: none;
-            box-shadow: 0 0 40px rgba(0,0,0,0.5), 0 0 20px var(--glow-cyan);
-            min-width: 500px; max-width: 90vw;
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 100;
+            background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 20px; backdrop-filter: blur(24px); display: none;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5), 0 0 20px var(--glow-cyan); min-width: 500px; max-width: 90vw;
         }
         #comparison.visible { display: block; }
-        #comparison h3 {
-            font-size: 0.75rem; font-weight: 800; letter-spacing: 0.15em;
-            color: var(--hologram); margin-bottom: 12px; font-family: var(--font-mono);
-        }
+        #comparison h3 { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.15em; color: var(--hologram); margin-bottom: 12px; font-family: var(--font-mono); }
         .comp-selectors { display: flex; gap: 16px; margin-bottom: 16px; }
-        .comp-selectors select {
-            flex: 1; background: var(--surface); border: 1px solid var(--border);
-            color: var(--text); padding: 8px 12px; border-radius: var(--radius-sm);
-            font-family: var(--font-mono); font-size: 0.75rem; outline: none;
-        }
+        .comp-selectors select { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.75rem; outline: none; }
         .comp-selectors select:focus { border-color: var(--hologram); }
         #comp-stats { font-size: 0.75rem; }
         .comp-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); }
         .comp-label { color: var(--text-muted); width: 30%; font-family: var(--font-mono); font-size: 0.65rem; }
         .comp-a { color: var(--hologram); width: 35%; text-align: right; font-family: var(--font-mono); font-weight: 700; }
         .comp-b { color: var(--plasma); width: 35%; text-align: right; font-family: var(--font-mono); font-weight: 700; }
+        #size-compare { margin-top: 12px; height: 60px; position: relative; display: flex; align-items: center; justify-content: center; gap: 20px; }
+        .size-circle { border-radius: 50%; border: 2px solid; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-family: var(--font-mono); }
+        .size-a { border-color: var(--hologram); color: var(--hologram); }
+        .size-b { border-color: var(--plasma); color: var(--plasma); }
 
-        /* ── CONTROLS ── */
+        /* CONTROLS */
         #controls {
             position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
             display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
             z-index: 100; max-width: calc(100vw - 32px);
         }
         #controls button {
-            background: var(--surface); border: 1px solid var(--border);
-            color: var(--text-muted); padding: 8px 14px;
-            border-radius: var(--radius-pill); cursor: pointer;
+            background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 8px 14px; border-radius: var(--radius-pill); cursor: pointer;
             font-size: 0.72rem; font-weight: 700; font-family: var(--font-mono);
-            letter-spacing: 0.04em; backdrop-filter: blur(16px);
-            transition: all 0.2s ease;
+            letter-spacing: 0.04em; backdrop-filter: blur(16px); transition: all 0.2s ease;
             box-shadow: inset 0 1px 0 rgba(0,255,212,0.04);
         }
-        #controls button:hover {
-            transform: translateY(-2px); color: var(--text);
-            border-color: var(--hologram);
-            box-shadow: 0 0 20px var(--glow-cyan), inset 0 1px 0 rgba(0,255,212,0.08);
-        }
-        #controls button.active {
-            background: linear-gradient(135deg, var(--hologram), var(--hologram-dim));
-            color: var(--void); border-color: var(--hologram);
-            box-shadow: 0 0 30px var(--glow-cyan);
-        }
+        #controls button:hover { transform: translateY(-2px); color: var(--text); border-color: var(--hologram); box-shadow: 0 0 20px var(--glow-cyan), inset 0 1px 0 rgba(0,255,212,0.08); }
+        #controls button.active { background: linear-gradient(135deg, var(--hologram), var(--hologram-dim)); color: var(--void); border-color: var(--hologram); box-shadow: 0 0 30px var(--glow-cyan); }
+        .speed-presets { display: flex; gap: 3px; margin-left: 4px; }
+        .speed-presets button { padding: 6px 10px; font-size: 0.6rem; }
 
-        /* ── MINIMAP ── */
+        /* MINIMAP */
         #minimap {
             position: fixed; bottom: 70px; right: 16px; width: 180px; height: 180px;
-            background: rgba(5,5,16,0.8); border: 1px solid var(--border);
-            border-radius: 50%; z-index: 100; overflow: hidden;
-            backdrop-filter: blur(12px);
+            background: rgba(5,5,16,0.8); border: 1px solid var(--border); border-radius: 50%;
+            z-index: 100; overflow: hidden; backdrop-filter: blur(12px);
             box-shadow: 0 0 30px rgba(0,255,212,0.1), inset 0 0 20px rgba(0,255,212,0.05);
+            cursor: pointer;
         }
 
-        /* ── TOUR OVERLAY ── */
+        /* TOUR */
         #tour-overlay {
-            position: fixed; inset: 0; z-index: 200;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
-            display: none; flex-direction: column; align-items: center; justify-content: center;
+            position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px); display: none; flex-direction: column;
+            align-items: center; justify-content: center;
         }
         #tour-overlay.visible { display: flex; }
-        .tour-content {
-            text-align: center; max-width: 500px; padding: 40px;
-        }
-        .tour-content h2 {
-            font-size: 1.5rem; font-weight: 800; color: var(--hologram);
-            text-shadow: 0 0 20px var(--glow-cyan); font-family: var(--font-mono);
-            letter-spacing: 0.05em; margin-bottom: 16px;
-        }
-        .tour-content p {
-            font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 24px;
-        }
-        .tour-step {
-            font-size: 0.65rem; color: var(--hologram-dim); font-family: var(--font-mono);
-            letter-spacing: 0.15em; margin-bottom: 20px;
-        }
+        .tour-content { text-align: center; max-width: 500px; padding: 40px; }
+        .tour-content h2 { font-size: 1.5rem; font-weight: 800; color: var(--hologram); text-shadow: 0 0 20px var(--glow-cyan); font-family: var(--font-mono); letter-spacing: 0.05em; margin-bottom: 16px; }
+        .tour-content p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 24px; }
+        .tour-step { font-size: 0.65rem; color: var(--hologram-dim); font-family: var(--font-mono); letter-spacing: 0.15em; margin-bottom: 20px; }
         .tour-btns { display: flex; gap: 12px; justify-content: center; }
-        .tour-btn {
-            background: var(--surface); border: 1px solid var(--border);
-            color: var(--text); padding: 10px 24px; border-radius: var(--radius-pill);
-            cursor: pointer; font-family: var(--font-mono); font-size: 0.75rem;
-            transition: all 0.2s ease;
-        }
+        .tour-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 10px 24px; border-radius: var(--radius-pill); cursor: pointer; font-family: var(--font-mono); font-size: 0.75rem; transition: all 0.2s ease; }
         .tour-btn:hover { border-color: var(--hologram); box-shadow: 0 0 15px var(--glow-cyan); }
         .tour-btn.primary { background: var(--hologram); color: var(--void); border-color: var(--hologram); }
 
-        /* ── SHORTCUTS ── */
+        /* SHORTCUTS */
         #shortcuts {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-            z-index: 300; background: var(--surface-raised); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 28px;
-            backdrop-filter: blur(24px); display: none;
-            box-shadow: 0 0 60px rgba(0,0,0,0.6), 0 0 30px var(--glow-cyan);
-            min-width: 380px;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 300;
+            background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 28px; backdrop-filter: blur(24px); display: none;
+            box-shadow: 0 0 60px rgba(0,0,0,0.6), 0 0 30px var(--glow-cyan); min-width: 380px; max-height: 80vh; overflow-y: auto;
         }
         #shortcuts.visible { display: block; }
-        #shortcuts h3 {
-            font-size: 0.8rem; font-weight: 800; letter-spacing: 0.15em;
-            color: var(--hologram); margin-bottom: 16px; font-family: var(--font-mono);
-        }
+        #shortcuts h3 { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.15em; color: var(--hologram); margin-bottom: 16px; font-family: var(--font-mono); }
         .sc-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.75rem; }
-        .sc-key { color: var(--hologram); font-family: var(--font-mono); font-weight: 700; }
+        .sc-key { color: var(--hologram); font-family: var(--font-mono); font-weight: 700; min-width: 40px; }
         .sc-desc { color: var(--text-muted); }
 
-        /* ── ACHIEVEMENT ── */
+        /* ACHIEVEMENT */
         #achievement {
             position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-80px);
             z-index: 200; background: var(--surface-raised); border: 1px solid var(--border-bright);
-            border-radius: var(--radius-lg); padding: 16px 24px;
-            backdrop-filter: blur(24px); display: flex; align-items: center; gap: 12px;
+            border-radius: var(--radius-lg); padding: 16px 24px; backdrop-filter: blur(24px);
+            display: flex; align-items: center; gap: 12px;
             transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), opacity 0.5s ease;
             opacity: 0; box-shadow: 0 0 40px var(--glow-cyan);
         }
@@ -406,77 +264,119 @@
         .ach-title { font-size: 0.72rem; font-weight: 800; color: var(--hologram); font-family: var(--font-mono); letter-spacing: 0.08em; }
         .ach-desc { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
 
-        /* ── TOAST ── */
-        #toast-container {
-            position: fixed; bottom: 80px; right: 16px; z-index: 150;
-            display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
-        }
+        /* TOAST */
+        #toast-container { position: fixed; bottom: 80px; right: 16px; z-index: 150; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
         .toast {
-            background: var(--surface-raised); border: 1px solid var(--border);
-            border-radius: var(--radius-pill); padding: 10px 20px;
-            font-size: 0.72rem; font-family: var(--font-mono); color: var(--text);
-            backdrop-filter: blur(16px);
-            animation: toastIn 0.4s ease, toastOut 0.4s ease 3s forwards;
+            background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-pill);
+            padding: 10px 20px; font-size: 0.72rem; font-family: var(--font-mono); color: var(--text);
+            backdrop-filter: blur(16px); animation: toastIn 0.4s ease, toastOut 0.4s ease 3s forwards;
             box-shadow: 0 0 20px rgba(0,0,0,0.4);
         }
         @keyframes toastIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(50px); } }
 
-        /* ── EXPLORE BAR ── */
-        #explore-bar {
-            position: fixed; top: 0; left: 0; right: 0; height: 3px;
-            z-index: 100; background: rgba(0,255,212,0.05);
-        }
-        .exp-fill {
-            height: 100%; background: linear-gradient(90deg, var(--hologram), var(--plasma));
-            width: 0%; transition: width 0.5s ease;
-            box-shadow: 0 0 10px var(--glow-cyan);
-        }
-        .exp-text {
-            position: fixed; top: 6px; right: 16px; font-size: 0.55rem;
-            color: var(--text-muted); font-family: var(--font-mono); letter-spacing: 0.1em;
-            z-index: 100;
-        }
+        /* EXPLORE BAR */
+        #explore-bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 100; background: rgba(0,255,212,0.05); }
+        .exp-fill { height: 100%; background: linear-gradient(90deg, var(--hologram), var(--plasma)); width: 0%; transition: width 0.5s ease; box-shadow: 0 0 10px var(--glow-cyan); }
+        .exp-text { position: fixed; top: 6px; right: 16px; font-size: 0.55rem; color: var(--text-muted); font-family: var(--font-mono); letter-spacing: 0.1em; z-index: 100; }
 
-        /* ── SETTINGS ── */
+        /* SETTINGS */
         #settings {
-            position: fixed; top: 50%; right: -320px; transform: translateY(-50%);
-            width: 280px; z-index: 250; background: var(--surface-raised);
-            border: 1px solid var(--border); border-radius: var(--radius-lg);
+            position: fixed; top: 50%; right: -320px; transform: translateY(-50%); width: 280px; z-index: 250;
+            background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-lg);
             padding: 24px; backdrop-filter: blur(24px); transition: right 0.4s cubic-bezier(0.16,1,0.3,1);
             box-shadow: 0 0 40px rgba(0,0,0,0.5);
         }
         #settings.visible { right: 16px; }
-        #settings h3 {
-            font-size: 0.75rem; font-weight: 800; letter-spacing: 0.15em;
-            color: var(--hologram); margin-bottom: 16px; font-family: var(--font-mono);
-        }
-        .setting-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 0; border-bottom: 1px solid var(--border);
-            font-size: 0.75rem; color: var(--text-muted);
-        }
-        .setting-row input[type="range"] {
-            width: 100px; accent-color: var(--hologram);
-        }
-        .setting-row select {
-            background: var(--surface); border: 1px solid var(--border);
-            color: var(--text); padding: 4px 8px; border-radius: var(--radius-sm);
-            font-family: var(--font-mono); font-size: 0.7rem;
-        }
+        #settings h3 { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.15em; color: var(--hologram); margin-bottom: 16px; font-family: var(--font-mono); }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted); }
+        .setting-row input[type="range"] { width: 100px; accent-color: var(--hologram); }
+        .setting-row select { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 4px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.7rem; }
 
-        /* ── LABELS ── */
+        /* LABELS */
         .planet-label {
             position: absolute; pointer-events: none; z-index: 50;
-            font-family: var(--font-mono); font-size: 0.62rem;
-            letter-spacing: 0.12em; color: var(--hologram-dim);
-            text-shadow: 0 0 8px var(--glow-cyan);
-            transform: translate(-50%, -100%); white-space: nowrap;
-            opacity: 0; transition: opacity 0.3s ease;
+            font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.12em;
+            color: var(--hologram-dim); text-shadow: 0 0 8px var(--glow-cyan);
+            transform: translate(-50%, -100%); white-space: nowrap; opacity: 0; transition: opacity 0.3s ease;
         }
         .planet-label.show { opacity: 1; }
 
-        /* ── RESPONSIVE ── */
+        /* TIMELINE */
+        #timeline {
+            position: fixed; bottom: 56px; left: 50%; transform: translateX(-50%);
+            z-index: 90; display: flex; align-items: center; gap: 10px;
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill);
+            padding: 6px 16px; backdrop-filter: blur(16px);
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            display: none;
+        }
+        #timeline.show { display: flex; }
+        #timeline label { font-size: 0.6rem; font-family: var(--font-mono); color: var(--hologram-dim); letter-spacing: 0.1em; }
+        #timeline input[type="range"] { width: 200px; accent-color: var(--hologram); }
+        #timeline-val { font-size: 0.6rem; font-family: var(--font-mono); color: var(--text); min-width: 80px; }
+
+        /* DISTANCE RULER */
+        #ruler-panel {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+            z-index: 110; background: var(--surface-raised); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 16px 24px; backdrop-filter: blur(20px);
+            display: none; text-align: center;
+            box-shadow: 0 0 30px var(--glow-amber);
+        }
+        #ruler-panel.visible { display: block; }
+        #ruler-panel h4 { font-size: 0.65rem; font-family: var(--font-mono); color: var(--solar); letter-spacing: 0.12em; margin-bottom: 8px; }
+        #ruler-from, #ruler-to { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.7rem; margin: 0 4px; }
+        #ruler-result { font-size: 0.75rem; font-family: var(--font-mono); color: var(--hologram); margin-top: 8px; }
+        #ruler-line { position: fixed; pointer-events: none; z-index: 95; }
+
+        /* PHENOMENA */
+        #phenomena-alert {
+            position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+            z-index: 120; background: rgba(255,184,0,0.1); border: 1px solid rgba(255,184,0,0.3);
+            border-radius: var(--radius-pill); padding: 8px 20px; font-size: 0.68rem;
+            font-family: var(--font-mono); color: var(--solar); letter-spacing: 0.08em;
+            backdrop-filter: blur(16px); display: none;
+            box-shadow: 0 0 20px var(--glow-amber);
+            animation: glowPulse 2s ease infinite;
+        }
+        #phenomena-alert.show { display: block; }
+        @keyframes glowPulse { 0%,100% { box-shadow: 0 0 20px var(--glow-amber); } 50% { box-shadow: 0 0 40px var(--glow-amber), 0 0 60px rgba(255,184,0,0.1); } }
+
+        /* CURSOR TRAIL */
+        .cursor-spark {
+            position: fixed; pointer-events: none; z-index: 9990;
+            width: 4px; height: 4px; border-radius: 50%;
+            background: var(--hologram); opacity: 0.8;
+            animation: sparkFade 0.6s ease forwards;
+        }
+        @keyframes sparkFade { to { transform: scale(0); opacity: 0; } }
+
+        /* COSMOS EASTER EGG */
+        #cosmos-flash {
+            position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+            background: radial-gradient(circle at center, rgba(0,255,212,0.3), rgba(255,0,110,0.2), rgba(123,47,190,0.3), transparent);
+            opacity: 0; transition: opacity 0.5s ease;
+        }
+        #cosmos-flash.show { opacity: 1; }
+
+        /* BOOKMARKS */
+        #bookmarks {
+            position: fixed; top: 50%; right: -280px; transform: translateY(-50%); width: 240px; z-index: 200;
+            background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 20px; backdrop-filter: blur(24px); transition: right 0.4s cubic-bezier(0.16,1,0.3,1);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+        #bookmarks.visible { right: 380px; }
+        #bookmarks h4 { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.15em; color: var(--solar); margin-bottom: 12px; font-family: var(--font-mono); }
+        .bm-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 4px; background: var(--surface); border: 1px solid transparent; transition: all 0.15s ease; }
+        .bm-item:hover { border-color: var(--border-bright); color: var(--text); }
+        .bm-del { color: var(--plasma); cursor: pointer; font-size: 0.9rem; }
+        .bm-del:hover { text-shadow: 0 0 8px var(--glow-magenta); }
+        #bm-save { background: rgba(255,184,0,0.1); border: 1px solid rgba(255,184,0,0.3); color: var(--solar); padding: 6px 12px; border-radius: var(--radius-pill); cursor: pointer; font-family: var(--font-mono); font-size: 0.6rem; margin-top: 8px; transition: all 0.2s ease; width: 100%; }
+        #bm-save:hover { box-shadow: 0 0 12px var(--glow-amber); }
+
+        /* RESPONSIVE */
         @media (max-width: 768px) {
             #hud { top: 10px; left: 10px; min-width: 180px; padding: 10px 14px; }
             #planet-nav { display: none; }
@@ -487,180 +387,71 @@
             #controls { bottom: 10px; gap: 4px; }
             #controls button { padding: 6px 10px; font-size: 0.65rem; }
             #comparison { min-width: auto; width: 92vw; }
+            .speed-presets { display: none; }
+            #timeline input { width: 140px; }
         }
-
-        /* ── ANIMATIONS ── */
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-        @keyframes glowPulse { 0%, 100% { box-shadow: 0 0 20px var(--glow-cyan); } 50% { box-shadow: 0 0 40px var(--glow-cyan), 0 0 60px rgba(0,255,212,0.1); } }
-        @keyframes borderGlow {
-            0%, 100% { border-color: var(--border); }
-            50% { border-color: var(--border-bright); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
-        }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; } }
     </style>
 </head>
 <body>
-    <!-- Loading -->
-    <div id="loading">
-        <div style="position:relative;display:flex;align-items:center;justify-content:center;">
-            <div class="loader-ring"></div>
-            <div class="loader-ring-inner"></div>
-        </div>
-        <h1>⬡ ASTRAL COMMAND</h1>
-        <div class="sub">INITIALIZING OBSERVATORY SYSTEMS</div>
-        <div class="bar-track"><div class="bar-fill" id="load-bar"></div></div>
-    </div>
-
-    <!-- Exploration Bar -->
+    <div id="loading"><div style="position:relative;display:flex;align-items:center;justify-content:center;"><div class="loader-ring"></div><div class="loader-ring-inner"></div></div><h1>⬡ ASTRAL COMMAND</h1><div class="sub">INITIALIZING OBSERVATORY SYSTEMS</div><div class="bar-track"><div class="bar-fill" id="load-bar"></div></div></div>
     <div id="explore-bar"><div class="exp-fill" id="exp-fill"></div></div>
     <div class="exp-text" id="exp-text">0 / 0 EXPLORED</div>
-
-    <!-- HUD -->
-    <div id="hud">
-        <h1>⬡ ASTRAL COMMAND</h1>
-        <div class="time-display" id="sim-time">DAY 0</div>
-        <div class="speed-display" id="speed-display">SPEED: 1.0×</div>
-        <div class="coord-display" id="coord-display">X:0 Y:0 Z:0</div>
-    </div>
-
-    <!-- Planet Nav -->
+    <div id="hud"><h1>⬡ ASTRAL COMMAND</h1><div class="time-display" id="sim-time">DAY 0</div><div class="speed-display" id="speed-display">SPEED: 1.0×</div><div class="coord-display" id="coord-display">X:0 Y:0 Z:0</div></div>
     <div id="planet-nav">
-        <div class="nav-section">
-            <div class="nav-section-title">★ Star</div>
-            <div class="nav-item" data-name="The Sun"><div class="nav-dot" style="background:#FFB800"></div><span class="nav-name">The Sun</span></div>
-        </div>
-        <div class="nav-section">
-            <div class="nav-section-title">● Planets</div>
-            <div class="nav-item" data-name="Mercury"><div class="nav-dot" style="background:#b5b5b5"></div><span class="nav-name">Mercury</span></div>
-            <div class="nav-item" data-name="Venus"><div class="nav-dot" style="background:#e8cda0"></div><span class="nav-name">Venus</span></div>
-            <div class="nav-item" data-name="Earth"><div class="nav-dot" style="background:#4488ff"></div><span class="nav-name">Earth</span></div>
-            <div class="nav-item" data-name="Mars"><div class="nav-dot" style="background:#cc5533"></div><span class="nav-name">Mars</span></div>
-            <div class="nav-item" data-name="Jupiter"><div class="nav-dot" style="background:#d4a574"></div><span class="nav-name">Jupiter</span></div>
-            <div class="nav-item" data-name="Saturn"><div class="nav-dot" style="background:#ead6a6"></div><span class="nav-name">Saturn</span></div>
-            <div class="nav-item" data-name="Uranus"><div class="nav-dot" style="background:#88ccdd"></div><span class="nav-name">Uranus</span></div>
-            <div class="nav-item" data-name="Neptune"><div class="nav-dot" style="background:#3355cc"></div><span class="nav-name">Neptune</span></div>
-        </div>
-        <div class="nav-section">
-            <div class="nav-section-title">◆ Dwarf Planets</div>
-            <div class="nav-item" data-name="Ceres"><div class="nav-dot" style="background:#778899"></div><span class="nav-name">Ceres</span></div>
-            <div class="nav-item" data-name="Pluto"><div class="nav-dot" style="background:#ccbbaa"></div><span class="nav-name">Pluto</span></div>
-        </div>
-        <div class="nav-section">
-            <div class="nav-section-title">☄ Comet</div>
-            <div class="nav-item" data-name="Halley"><div class="nav-dot" style="background:#aaddff"></div><span class="nav-name">Halley</span></div>
-        </div>
-        <div class="nav-section">
-            <div class="nav-section-title">🛰 Stations</div>
-            <div class="nav-item" data-name="ISS"><div class="nav-dot" style="background:#cccccc"></div><span class="nav-name">ISS</span></div>
-            <div class="nav-item" data-name="Tiangong"><div class="nav-dot" style="background:#FFB800"></div><span class="nav-name">Tiangong</span></div>
-            <div class="nav-item" data-name="Hubble"><div class="nav-dot" style="background:#8888ff"></div><span class="nav-name">Hubble</span></div>
-            <div class="nav-item" data-name="James Webb"><div class="nav-dot" style="background:#ff6644"></div><span class="nav-name">James Webb</span></div>
-            <div class="nav-item" data-name="Gateway"><div class="nav-dot" style="background:#44aaff"></div><span class="nav-name">Gateway</span></div>
-        </div>
+        <div class="nav-section"><div class="nav-section-title">★ Star</div><div class="nav-item" data-name="The Sun"><div class="nav-dot" style="background:#FFB800"></div><span class="nav-name">The Sun</span></div></div>
+        <div class="nav-section"><div class="nav-section-title">● Planets</div><div class="nav-item" data-name="Mercury"><div class="nav-dot" style="background:#b5b5b5"></div><span class="nav-name">Mercury</span></div><div class="nav-item" data-name="Venus"><div class="nav-dot" style="background:#e8cda0"></div><span class="nav-name">Venus</span></div><div class="nav-item" data-name="Earth"><div class="nav-dot" style="background:#4488ff"></div><span class="nav-name">Earth</span></div><div class="nav-item" data-name="Mars"><div class="nav-dot" style="background:#cc5533"></div><span class="nav-name">Mars</span></div><div class="nav-item" data-name="Jupiter"><div class="nav-dot" style="background:#d4a574"></div><span class="nav-name">Jupiter</span></div><div class="nav-item" data-name="Saturn"><div class="nav-dot" style="background:#ead6a6"></div><span class="nav-name">Saturn</span></div><div class="nav-item" data-name="Uranus"><div class="nav-dot" style="background:#88ccdd"></div><span class="nav-name">Uranus</span></div><div class="nav-item" data-name="Neptune"><div class="nav-dot" style="background:#3355cc"></div><span class="nav-name">Neptune</span></div></div>
+        <div class="nav-section"><div class="nav-section-title">◆ Dwarf Planets</div><div class="nav-item" data-name="Ceres"><div class="nav-dot" style="background:#778899"></div><span class="nav-name">Ceres</span></div><div class="nav-item" data-name="Pluto"><div class="nav-dot" style="background:#ccbbaa"></div><span class="nav-name">Pluto</span></div></div>
+        <div class="nav-section"><div class="nav-section-title">☄ Comet</div><div class="nav-item" data-name="Halley"><div class="nav-dot" style="background:#aaddff"></div><span class="nav-name">Halley</span></div></div>
+        <div class="nav-section"><div class="nav-section-title">📡 Probes</div><div class="nav-item" data-name="Voyager 1"><div class="nav-dot" style="background:#ffcc44"></div><span class="nav-name">Voyager 1</span></div><div class="nav-item" data-name="Voyager 2"><div class="nav-dot" style="background:#ffaa22"></div><span class="nav-name">Voyager 2</span></div></div>
+        <div class="nav-section"><div class="nav-section-title">🛰 Stations</div><div class="nav-item" data-name="ISS"><div class="nav-dot" style="background:#cccccc"></div><span class="nav-name">ISS</span></div><div class="nav-item" data-name="Tiangong"><div class="nav-dot" style="background:#FFB800"></div><span class="nav-name">Tiangong</span></div><div class="nav-item" data-name="Hubble"><div class="nav-dot" style="background:#8888ff"></div><span class="nav-name">Hubble</span></div><div class="nav-item" data-name="James Webb"><div class="nav-dot" style="background:#ff6644"></div><span class="nav-name">James Webb</span></div><div class="nav-item" data-name="Gateway"><div class="nav-dot" style="background:#44aaff"></div><span class="nav-name">Gateway</span></div></div>
     </div>
-
-    <!-- Search -->
-    <div id="search-container">
-        <span class="search-icon">⌕</span>
-        <input type="text" placeholder="Search bodies, stations..." id="search-input" autocomplete="off">
-        <div id="search-dropdown"></div>
-    </div>
-
-    <!-- Info Panel -->
-    <div id="info-panel">
-        <button id="close-info">×</button>
-        <h2 id="info-name"></h2>
-        <div id="info-type-badge"></div>
-        <div id="info-stats"></div>
-        <div id="info-desc"></div>
-        <div id="info-fact"></div>
-    </div>
-
-    <!-- Comparison -->
-    <div id="comparison">
-        <h3>◈ COMPARISON MODE</h3>
-        <div class="comp-selectors">
-            <select id="comp-a"></select>
-            <span style="color:var(--text-muted);align-self:center;font-family:var(--font-mono);font-size:0.7rem;">VS</span>
-            <select id="comp-b"></select>
-        </div>
-        <div id="comp-stats"></div>
-    </div>
-
-    <!-- Controls -->
+    <div id="search-container"><span class="search-icon">⌕</span><input type="text" placeholder="Search bodies, stations..." id="search-input" autocomplete="off"><div id="search-dropdown"></div></div>
+    <div id="info-panel"><button id="close-info">×</button><h2 id="info-name"></h2><div id="info-type-badge"></div><div id="info-stats"></div><div id="info-desc"></div><div id="info-fact"></div><div id="info-light-time"></div><div id="info-distance"></div></div>
+    <div id="comparison"><h3>◈ COMPARISON MODE</h3><div class="comp-selectors"><select id="comp-a"></select><span style="color:var(--text-muted);align-self:center;font-family:var(--font-mono);font-size:0.7rem;">VS</span><select id="comp-b"></select></div><div id="comp-stats"></div><div id="size-compare"></div></div>
     <div id="controls">
-        <button id="btn-slower">⏪</button>
-        <button id="btn-pause" class="active">⏸</button>
-        <button id="btn-faster">⏩</button>
-        <button id="btn-orbits">◎</button>
-        <button id="btn-labels">🏷</button>
-        <button id="btn-follow">🎯</button>
-        <button id="btn-stations">🛰</button>
-        <button id="btn-comet">☄</button>
-        <button id="btn-compare">⚖</button>
-        <button id="btn-tour">🗺</button>
-        <button id="btn-screenshot">📷</button>
-        <button id="btn-fullscreen">⛶</button>
+        <button id="btn-slower">⏪</button><button id="btn-pause" class="active">⏸</button><button id="btn-faster">⏩</button>
+        <div class="speed-presets"><button id="btn-1x">1×</button><button id="btn-10x">10×</button><button id="btn-50x">50×</button><button id="btn-max">MAX</button></div>
+        <button id="btn-orbits">◎</button><button id="btn-labels">🏷</button><button id="btn-follow">🎯</button>
+        <button id="btn-stations">🛰</button><button id="btn-comet">☄</button><button id="btn-trails">〰</button>
+        <button id="btn-scale">⚖</button><button id="btn-ruler">📏</button><button id="btn-timeline">🕜</button>
+        <button id="btn-bookmark">🔖</button><button id="btn-compare">⊞</button>
+        <button id="btn-tour">🗺</button><button id="btn-screenshot">📷</button><button id="btn-fullscreen">⛶</button>
         <button id="btn-keyboard">⌨</button>
     </div>
-
-    <!-- Minimap -->
     <div id="minimap"><canvas id="minimap-canvas" width="180" height="180"></canvas></div>
-
-    <!-- Tour Overlay -->
-    <div id="tour-overlay">
-        <div class="tour-content">
-            <div class="tour-step" id="tour-step"></div>
-            <h2 id="tour-title"></h2>
-            <p id="tour-desc"></p>
-            <div class="tour-btns">
-                <button class="tour-btn" id="tour-prev">◀ PREV</button>
-                <button class="tour-btn primary" id="tour-next">NEXT ▶</button>
-                <button class="tour-btn" id="tour-end">END TOUR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Shortcuts -->
+    <div id="tour-overlay"><div class="tour-content"><div class="tour-step" id="tour-step"></div><h2 id="tour-title"></h2><p id="tour-desc"></p><div class="tour-btns"><button class="tour-btn" id="tour-prev">◀ PREV</button><button class="tour-btn primary" id="tour-next">NEXT ▶</button><button class="tour-btn" id="tour-end">END TOUR</button></div></div></div>
     <div id="shortcuts">
         <h3>⌨ KEYBOARD SHORTCUTS</h3>
         <div class="sc-row"><span class="sc-key">1-8</span><span class="sc-desc">Navigate to planets</span></div>
         <div class="sc-row"><span class="sc-key">0</span><span class="sc-desc">Navigate to Sun</span></div>
+        <div class="sc-row"><span class="sc-key">9</span><span class="sc-desc">Navigate to Pluto</span></div>
         <div class="sc-row"><span class="sc-key">+/-</span><span class="sc-desc">Speed up / slow down</span></div>
         <div class="sc-row"><span class="sc-key">Space</span><span class="sc-desc">Pause / play</span></div>
         <div class="sc-row"><span class="sc-key">O</span><span class="sc-desc">Toggle orbits</span></div>
         <div class="sc-row"><span class="sc-key">L</span><span class="sc-desc">Toggle labels</span></div>
+        <div class="sc-row"><span class="sc-key">T</span><span class="sc-desc">Toggle trails</span></div>
+        <div class="sc-row"><span class="sc-key">G</span><span class="sc-desc">Toggle scale mode</span></div>
+        <div class="sc-row"><span class="sc-key">R</span><span class="sc-desc">Distance ruler</span></div>
+        <div class="sc-row"><span class="sc-key">B</span><span class="sc-desc">Bookmark current view</span></div>
+        <div class="sc-row"><span class="sc-key">V</span><span class="sc-desc">Toggle Voyager probes</span></div>
         <div class="sc-row"><span class="sc-key">F</span><span class="sc-desc">Fullscreen</span></div>
         <div class="sc-row"><span class="sc-key">S</span><span class="sc-desc">Screenshot</span></div>
         <div class="sc-row"><span class="sc-key">C</span><span class="sc-desc">Comparison mode</span></div>
-        <div class="sc-row"><span class="sc-key">T</span><span class="sc-desc">Guided tour</span></div>
+        <div class="sc-row"><span class="sc-key">D</span><span class="sc-desc">Guided tour</span></div>
         <div class="sc-row"><span class="sc-key">?</span><span class="sc-desc">This panel</span></div>
         <div class="sc-row"><span class="sc-key">Esc</span><span class="sc-desc">Unfocus / close</span></div>
     </div>
-
-    <!-- Achievement -->
-    <div id="achievement">
-        <div class="ach-icon" id="ach-icon"></div>
-        <div><div class="ach-title" id="ach-title"></div><div class="ach-desc" id="ach-desc"></div></div>
-    </div>
-
-    <!-- Toast Container -->
+    <div id="achievement"><div class="ach-icon" id="ach-icon"></div><div><div class="ach-title" id="ach-title"></div><div class="ach-desc" id="ach-desc"></div></div></div>
     <div id="toast-container"></div>
-
-    <!-- Settings -->
-    <div id="settings">
-        <h3>⚙ SETTINGS</h3>
-        <div class="setting-row"><span>Quality</span><select id="set-quality"><option value="low">Low</option><option value="med" selected>Med</option><option value="high">High</option></select></div>
-        <div class="setting-row"><span>Sound</span><input type="range" id="set-sound" min="0" max="100" value="50"></div>
-        <div class="setting-row"><span>Cam Sensitivity</span><input type="range" id="set-sensitivity" min="1" max="10" value="5"></div>
-    </div>
-
-    <!-- Labels container -->
+    <div id="settings"><h3>⚙ SETTINGS</h3><div class="setting-row"><span>Quality</span><select id="set-quality"><option value="low">Low</option><option value="med" selected>Med</option><option value="high">High</option></select></div><div class="setting-row"><span>Sound</span><input type="range" id="set-sound" min="0" max="100" value="50"></div><div class="setting-row"><span>Cam Sensitivity</span><input type="range" id="set-sensitivity" min="1" max="10" value="5"></div><div class="setting-row"><span>Cursor Trail</span><select id="set-trail"><option value="on">On</option><option value="off" selected>Off</option></select></div></div>
+    <div id="timeline"><label>◷ DATE</label><input type="range" id="timeline-scrub" min="0" max="36500" value="0"><span id="timeline-val">Year 1 Day 1</span></div>
+    <div id="ruler-panel"><h4>📏 DISTANCE RULER</h4><select id="ruler-from"></select><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.7rem;">↔</span><select id="ruler-to"></select><div id="ruler-result"></div></div>
+    <div id="phenomena-alert"></div>
+    <div id="cosmos-flash"></div>
+    <div id="bookmarks"><h4>🔖 BOOKMARKS</h4><div id="bm-list"></div><button id="bm-save">+ SAVE CURRENT VIEW</button></div>
     <div id="labels-container"></div>
-
+    <canvas id="ruler-line" style="position:fixed;pointer-events:none;z-index:95;"></canvas>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="main.js"></script>
 </body>
